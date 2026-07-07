@@ -9,6 +9,7 @@ export const config = {
   corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
   ytDlpPath: process.env.YT_DLP_PATH ?? 'yt-dlp',
   ffmpegPath: process.env.FFMPEG_PATH ?? 'ffmpeg',
+  instagramCookiesPath: process.env.INSTAGRAM_COOKIES_PATH || null,
   tmpDir: process.env.TMP_DIR ?? path.join(__dirname, '..', '..', 'tmp'),
   maxConcurrentDownloads: Number(process.env.MAX_CONCURRENT_DOWNLOADS ?? 3),
   jobTtlMs: Number(process.env.JOB_TTL_MS ?? 30 * 60 * 1000), // 30 min

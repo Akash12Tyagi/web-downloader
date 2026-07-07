@@ -3,7 +3,7 @@ import path from 'path';
 import { nanoid } from 'nanoid';
 import { config } from '../config';
 import { AppError, type DownloadJob, type DownloadRequest, type HistoryEntry } from '../types';
-import { downloadDirectFile, downloadWithArgs } from './ytdlp.service';
+import { cookieArgsFor, downloadDirectFile, downloadWithArgs } from './ytdlp.service';
 import { buildDownloadPlan } from '../utils/formatSelector';
 import { sanitizeFileName } from '../utils/url';
 import { addHistoryEntry } from './history.service';
@@ -107,7 +107,7 @@ async function processQueue(request: DownloadRequest) {
       const outputTemplate = path.join(config.tmpDir, `${job.id}-${safeTitle}.%(ext)s`);
       const { filePath } = await downloadWithArgs(
         request.url,
-        plan.args,
+        [...cookieArgsFor(request.platform), ...plan.args],
         outputTemplate,
         (update) => {
           job.status = update.status;

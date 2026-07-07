@@ -40,7 +40,13 @@ export function buildDownloadPlan(request: DownloadRequest): DownloadPlan {
 
   if (request.formatId === 'highest') {
     return {
-      args: [...playlistArgs, '-f', 'bestvideo+bestaudio/best', '--merge-output-format', 'mp4'],
+      args: [
+        ...playlistArgs,
+        '-f',
+        'bestvideo+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
+        '--merge-output-format',
+        'mp4',
+      ],
       extension: 'mp4',
     };
   }
@@ -63,7 +69,7 @@ export function buildDownloadPlan(request: DownloadRequest): DownloadPlan {
   return {
     args: [
       '-f',
-      `${request.formatId}+bestaudio/${request.formatId}/best`,
+      `${request.formatId}+bestaudio[ext=m4a]/${request.formatId}+bestaudio/${request.formatId}/best`,
       '--merge-output-format',
       'mp4',
     ],

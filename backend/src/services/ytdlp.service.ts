@@ -65,6 +65,17 @@ function mapYtDlpError(stderr: string): AppError {
   ) {
     return new AppError('This content is unavailable or has been removed.', 404, 'CONTENT_REMOVED');
   }
+  if (
+    s.includes('empty media response') ||
+    s.includes('unable to extract data') ||
+    (s.includes('instagram') && (s.includes('rate') || s.includes('checkpoint')))
+  ) {
+    return new AppError(
+      'Instagram is blocking anonymous requests for this content. Ask the server admin to configure INSTAGRAM_COOKIES_PATH with a logged-in cookies.txt file.',
+      403,
+      'IG_AUTH_REQUIRED',
+    );
+  }
   if (s.includes('unsupported url')) {
     return new AppError('This URL isn’t supported.', 422, 'UNSUPPORTED_PLATFORM');
   }
@@ -104,6 +115,14 @@ function runYtDlpJson(args: string[]): Promise<string> {
       },
     );
   });
+}
+
+/** Instagram now rejects most anonymous scraping; attach a cookies.txt file when configured. */
+export function cookieArgsFor(platform: Platform): string[] {
+  if (platform === 'instagram' && config.instagramCookiesPath) {
+    return ['--cookies', config.instagramCookiesPath];
+  }
+  return [];
 }
 
 function pickThumbnail(info: RawInfo): string | null {
@@ -251,7 +270,7 @@ function mapCarousel(info: RawInfo, platform: Platform, url: string): AnalyzeRes
 }
 
 export async function analyzeUrl(url: string, platform: Platform): Promise<AnalyzeResult> {
-  const args = ['-J', '--no-warnings', '--socket-timeout', '20'];
+  const args = ['-J', '--no-warnings', '--socket-timeout', '20', ...cookieArgsFor(platform)];
   if (platform === 'youtube') args.push('--no-playlist');
   args.push(url);
 
