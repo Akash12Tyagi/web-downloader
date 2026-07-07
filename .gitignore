@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build output
+frontend/.next/
+frontend/out/
+backend/dist/
+
+# Env files
+.env
+.env.local
+.env*.local
+!.env.example
+
+# Media processing temp files
+backend/tmp/
+*.part
+*.ytdl
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+*.pem
+.vscode/
+.idea/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
