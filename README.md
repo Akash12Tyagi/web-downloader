@@ -96,3 +96,24 @@ This builds the backend image (Node + yt-dlp + ffmpeg preinstalled) and the fron
 ## Environment variables
 
 See [`backend/.env.example`](backend/.env.example) and [`frontend/.env.example`](frontend/.env.example) for the full list (ports, rate limits, concurrency, cache TTLs, CORS origin, API URL).
+
+## Deploying to Railway
+
+The backend spawns `yt-dlp`/`ffmpeg` processes and keeps job/history state in memory, so it needs a persistent container (not a serverless function). Railway works well since it builds each Dockerfile directly.
+
+1. Push this repo to GitHub, then in Railway: **New Project → Deploy from GitHub repo**.
+2. Add the **backend** service: root directory `backend` (Railway auto-detects `backend/railway.json` + `Dockerfile`). Set variables:
+   ```
+   NODE_ENV=production
+   MAX_CONCURRENT_DOWNLOADS=3
+   CORS_ORIGIN=<frontend's public URL, set after step 3>
+   ```
+   Generate a public domain for it (Settings → Networking).
+3. Add the **frontend** service: root directory `frontend`. Set:
+   ```
+   NEXT_PUBLIC_API_URL=<backend's public URL from step 2>
+   ```
+   This is a Docker build `ARG`, so it must be the real backend URL — Railway forwards service variables as build args automatically. Generate a public domain for it too.
+4. Go back and set the backend's `CORS_ORIGIN` to the frontend's actual domain, then redeploy both services.
+
+Keep the backend at **1 replica** — the in-memory queue/history doesn't support horizontal scaling (see Known limitations above). For Instagram support in production, set `INSTAGRAM_COOKIES_PATH` and mount a cookies file as a Railway volume.
